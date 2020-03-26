@@ -43,27 +43,4 @@ class CsvServiceTest {
 
         Assertions.assertEquals(expectedResult, csvService.getGeoPositionsAsCsv(csvService.getGeoPositions(json), Arrays.asList("id", "latitude", "longitude")));
     }
-
-    @Test
-    public void shouldSetJsoNodeHeader() throws IOException {
-
-        String json = "[{\"position\":\"Vancover\",\"key\":\"key\",\"name\":\"samplename\",\"fullName\":\"SampleName\",\"country\":null,\"inEurope\":true,\"countryCode\":\"US\",\"coreCountry\":true,\"distance\":40,\"iata_airport_code\":\"432\",\"_type\":\"type10\",\"_id\":\"1230\",\"geo_position\":\"{latitude=111.123, longitude=2222.2222}\",\"location_id\":13}]";
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        JsonNode jsonTree = mapper.readTree(json);
-
-        CsvSchema.Builder csvSchemaBuilder = CsvSchema.builder();
-        JsonNode firstObject = jsonTree.elements().next();
-        firstObject.fieldNames().forEachRemaining(fieldName -> {
-            csvSchemaBuilder.addColumn(fieldName);
-        });
-        CsvSchema csvSchema = csvSchemaBuilder.build().withHeader();
-
-        CsvMapper csvMapper = new CsvMapper();
-        csvMapper.writerFor(JsonNode.class)
-                .with(csvSchema).writeValueAsString(jsonTree);
-
-    }
-
 }
