@@ -48,7 +48,6 @@ public class CsvService {
 
     public String getGeoPositionsAsCsv(List<GeoPosition> geoPositions, List<String> params) {
 
-
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append("'");
@@ -62,7 +61,7 @@ public class CsvService {
         }
 
 
-        return stringBuilder.toString();
+        return geoPositions.isEmpty()|| params.isEmpty() ?"Empty string": stringBuilder.toString();
     }
 
     StringBuilder createByParam(Map<String, String> params, GeoPosition geoPosition, StringBuilder str) {
