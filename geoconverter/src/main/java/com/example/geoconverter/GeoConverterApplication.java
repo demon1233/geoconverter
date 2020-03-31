@@ -6,10 +6,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
-public class GeoconverterApplication {
+public class GeoConverterApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(GeoconverterApplication.class, args);
+        SpringApplication.run(GeoConverterApplication.class, args);
     }
 
     @Bean

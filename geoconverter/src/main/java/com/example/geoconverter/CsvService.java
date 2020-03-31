@@ -61,7 +61,7 @@ public class CsvService {
         }
 
 
-        return geoPositions.isEmpty()|| params.isEmpty() ?"Empty string": stringBuilder.toString();
+        return geoPositions.isEmpty() || params.isEmpty() ? "Empty string" : stringBuilder.toString();
     }
 
     StringBuilder createByParam(Map<String, String> params, GeoPosition geoPosition, StringBuilder str) {

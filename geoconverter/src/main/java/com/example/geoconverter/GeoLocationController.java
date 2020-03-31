@@ -23,9 +23,15 @@ public class GeoLocationController {
     @ResponseBody
     public String getGeoLocationListAsCsv(@PathVariable Integer size) {
         String json = restTemplate.getForObject("http://localhost:8086/generate/json/" + size, String.class);
+
         String result;
         try {
-            result = csvService.readJsonAsCsv(json);
+            if (json.equals("[]")|| json.isEmpty()) {
+                result = "Empty";
+            } else {
+                result =  csvService.readJsonAsCsv(json);
+            }
+
         } catch (IOException e) {
             throw new GeoInfoNotFoundException("Could not read value as csv");
         }
@@ -36,8 +42,13 @@ public class GeoLocationController {
     @ResponseBody
     public String getGeoLocationWithParameters(@PathVariable Integer size, @RequestParam List<String> params) throws Exception {
         String json = restTemplate.getForObject("http://localhost:8086/generate/json/" + size, String.class);
-
-        return csvService.getGeoPositionsAsCsv(csvService.getGeoPositions(json), params);
+        String result;
+        if (json.equals("[]")|| json.isEmpty()) {
+            result = "Empty";
+        } else {
+            result = csvService.getGeoPositionsAsCsv(csvService.getGeoPositions(json), params);
+        }
+        return result;
     }
 
 }
