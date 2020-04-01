@@ -35,7 +35,7 @@ class CsvServiceTest {
         String expectedResult = "'id, latitude, longitude, \n" +
                 "'1230,111.123,2222.2222'\n";
 
-        Assertions.assertEquals(expectedResult, csvService.getGeoPositionsAsCsv(csvService.getGeoPositions(json), Arrays.asList("id", "latitude", "longitude")));
+        Assertions.assertEquals(expectedResult, csvService.getGeoPositionsAsCsv(json, Arrays.asList("id", "latitude", "longitude")));
     }
 
     @Test
@@ -43,12 +43,12 @@ class CsvServiceTest {
 
         String json = "[{\"position\":\"Vancover\",\"key\":\"key\",\"name\":\"samplename\",\"fullName\":\"SampleName\",\"country\":null,\"inEurope\":true,\"countryCode\":\"US\",\"coreCountry\":true,\"distance\":40,\"iata_airport_code\":\"432\",\"_type\":\"type10\",\"_id\":\"1230\",\"geo_position\":\"{latitude=111.123, longitude=2222.2222}\",\"location_id\":13}]";
 
-        Assertions.assertEquals("Empty string", csvService.getGeoPositionsAsCsv(csvService.getGeoPositions(json), Collections.emptyList()));
+        Assertions.assertEquals("Empty string", csvService.getGeoPositionsAsCsv(json, Collections.emptyList()));
     }
 
     @Test
-    public void shouldNotConvertJsonToGeoPositionCSVWhenGeoPositionIsEmptyList() {
+    public void shouldNotConvertJsonToGeoPositionCSVWhenGeoPositionIsEmptyList() throws IOException {
 
-        Assertions.assertEquals("Empty string", csvService.getGeoPositionsAsCsv(Collections.emptyList(), Arrays.asList("id", "latitude", "longitude")));
+        Assertions.assertEquals("Empty string", csvService.getGeoPositionsAsCsv("[] ", Arrays.asList("id", "latitude", "longitude")));
     }
 }

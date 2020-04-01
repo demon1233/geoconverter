@@ -4,10 +4,10 @@ import com.example.geoconverter.dao.GeoPosition;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -18,10 +18,10 @@ import java.util.Map;
 @Service
 public class CsvService {
 
+    @Autowired
+    private ObjectMapper mapper;
 
     public String readJsonAsCsv(String json) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        SimpleFilterProvider filterProvider = new SimpleFilterProvider();
 
         JsonNode jsonTree = mapper.readTree(json);
         CsvSchema.Builder csvSchemaBuilder = CsvSchema.builder();
@@ -32,22 +32,16 @@ public class CsvService {
         CsvSchema csvSchema = csvSchemaBuilder.build().withHeader();
 
         CsvMapper csvMapper = new CsvMapper();
-        csvMapper.writer(filterProvider)
-                .with(csvSchema).writeValueAsString(jsonTree);
         return csvMapper.writerFor(JsonNode.class)
                 .with(csvSchema).writeValueAsString(jsonTree);
     }
 
 
-    public List<GeoPosition> getGeoPositions(String json) throws IOException {
 
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(json, new TypeReference<List<GeoPosition>>() {
-        });
-    }
 
-    public String getGeoPositionsAsCsv(List<GeoPosition> geoPositions, List<String> params) {
+    public String getGeoPositionsAsCsv(String json, List<String> params) throws IOException {
 
+        List<GeoPosition> geoPositions = getGeoPositions(json);
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append("'");
@@ -57,14 +51,14 @@ public class CsvService {
         stringBuilder.append('\n');
         for (GeoPosition geoPosition : geoPositions
         ) {
-            createByParam(transformQueryParamToDictionary(params), geoPosition, stringBuilder);
+            createGeoPointAsCsvRecordByParam(transformQueryParamToDictionary(params), geoPosition, stringBuilder);
         }
 
 
         return geoPositions.isEmpty() || params.isEmpty() ? "Empty string" : stringBuilder.toString();
     }
 
-    StringBuilder createByParam(Map<String, String> params, GeoPosition geoPosition, StringBuilder str) {
+    StringBuilder createGeoPointAsCsvRecordByParam(Map<String, String> params, GeoPosition geoPosition, StringBuilder str) {
         str.append("'");
 
         if (StringUtils.isNotBlank(params.get("id"))) {
@@ -94,6 +88,11 @@ public class CsvService {
         }
         return map;
 
+    }
+
+    private List<GeoPosition> getGeoPositions(String json) throws IOException {
+        return mapper.readValue(json, new TypeReference<List<GeoPosition>>() {
+        });
     }
 }
 

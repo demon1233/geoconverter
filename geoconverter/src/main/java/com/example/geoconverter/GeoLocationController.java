@@ -26,7 +26,7 @@ public class GeoLocationController {
 
         String result;
         try {
-            if (json.equals("[]")|| json.isEmpty()) {
+            if ((json != null ? json.equals("[]") : false) || json.isEmpty()) {
                 result = "Empty";
             } else {
                 result =  csvService.readJsonAsCsv(json);
@@ -43,10 +43,10 @@ public class GeoLocationController {
     public String getGeoLocationWithParameters(@PathVariable Integer size, @RequestParam List<String> params) throws Exception {
         String json = restTemplate.getForObject("http://localhost:8086/generate/json/" + size, String.class);
         String result;
-        if (json.equals("[]")|| json.isEmpty()) {
+        if ((json != null ? json.equals("[]") : false) || json.isEmpty()) {
             result = "Empty";
         } else {
-            result = csvService.getGeoPositionsAsCsv(csvService.getGeoPositions(json), params);
+            result = csvService.getGeoPositionsAsCsv(json, params);
         }
         return result;
     }
