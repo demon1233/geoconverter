@@ -1,6 +1,6 @@
 package com.example.geoconverter;
 
-import com.example.geoconverter.dao.GeoInfo;
+import com.example.geoconverter.pojo.GeoInfo;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;

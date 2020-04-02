@@ -8,12 +8,12 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication
 public class GeoConverterApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(GeoConverterApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(GeoConverterApplication.class, args);
+  }
 
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
+  @Bean
+  public RestTemplate restTemplate() {
+    return new RestTemplate();
+  }
 }
