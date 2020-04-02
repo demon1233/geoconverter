@@ -1,21 +1,28 @@
 package com.example.geoconverter.dao;
 
+import com.example.geoconverter.GeoInfoDeserializer;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Data
 @Builder
+@AllArgsConstructor
+@JsonFilter("csvFilter")
+@RequiredArgsConstructor
+@JsonDeserialize(using = GeoInfoDeserializer.class)
 public class GeoInfo {
 
-    @JsonFilter("myFilter")
+
     private String position;
 
-    @JsonProperty("key")
+
     private String key;
 
-    @JsonFilter("myFilter")
     private String name;
 
     private String fullName;
@@ -28,8 +35,13 @@ public class GeoInfo {
     private String id;
 
     private String country;
-    @JsonProperty("geo_position")
-    private String geoPosition;
+
+    @JsonProperty("latitude")
+    private String latitude;
+
+    @JsonProperty("longitude")
+    private String longitude;
+
     @JsonProperty("location_id")
     private String locationId;
 

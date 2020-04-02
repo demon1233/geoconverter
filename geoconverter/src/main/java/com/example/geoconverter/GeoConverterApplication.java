@@ -16,5 +16,4 @@ public class GeoConverterApplication {
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
-
 }

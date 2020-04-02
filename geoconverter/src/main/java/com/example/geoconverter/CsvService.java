@@ -1,19 +1,20 @@
 package com.example.geoconverter;
 
-import com.example.geoconverter.dao.GeoPosition;
+import com.example.geoconverter.dao.GeoInfo;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class CsvService {
@@ -21,77 +22,58 @@ public class CsvService {
     @Autowired
     private ObjectMapper mapper;
 
+
+    private CsvMapper csvMapper = new CsvMapper();
+
     public String readJsonAsCsv(String json) throws IOException {
+        SimpleFilterProvider filters = new SimpleFilterProvider();
+        filters.setFailOnUnknownId(false);
+        mapper.setFilterProvider(filters);
 
-        JsonNode jsonTree = mapper.readTree(json);
-        CsvSchema.Builder csvSchemaBuilder = CsvSchema.builder();
-        JsonNode firstObject = jsonTree.elements().next();
+        List<GeoInfo> geoInfos = getGeoInfos(json, mapper);
+        String deserializeJson = mapper.writeValueAsString(geoInfos);
 
-        firstObject.fieldNames().forEachRemaining(csvSchemaBuilder::addColumn);
+        JsonNode jsonTree = mapper.readTree(deserializeJson);
+        CsvSchema csvSchema = getColumns(jsonTree);
+        return getStringAsCsv(jsonTree, csvSchema);
+    }
 
-        CsvSchema csvSchema = csvSchemaBuilder.build().withHeader();
 
-        CsvMapper csvMapper = new CsvMapper();
+    public String readJsonAsCsv(String json, String[] params) throws IOException {
+        FilterProvider filters = new SimpleFilterProvider().addFilter(
+                "csvFilter", SimpleBeanPropertyFilter.filterOutAllExcept(params)
+        );
+        mapper.setFilterProvider(filters);
+
+        List<GeoInfo> geoInfos = getGeoInfos(json, mapper);
+        String jsonString = mapper.writer(filters)
+                .withDefaultPrettyPrinter()
+                .writeValueAsString(geoInfos);
+        JsonNode jsonTree = mapper.readTree(jsonString);
+        CsvSchema csvSchema = getColumns(jsonTree);
+
+
+        return getStringAsCsv(jsonTree, csvSchema);
+    }
+
+    private String getStringAsCsv(JsonNode jsonTree, CsvSchema csvSchema) throws JsonProcessingException {
         return csvMapper.writerFor(JsonNode.class)
                 .with(csvSchema).writeValueAsString(jsonTree);
     }
 
+    private CsvSchema getColumns(JsonNode jsonTree) {
+        CsvSchema.Builder csvSchemaBuilder = CsvSchema.builder();
+        JsonNode firstObject = jsonTree.elements().next();
 
 
+        firstObject.fieldNames().forEachRemaining(csvSchemaBuilder::addColumn);
 
-    public String getGeoPositionsAsCsv(String json, List<String> params) throws IOException {
-
-        List<GeoPosition> geoPositions = getGeoPositions(json);
-        StringBuilder stringBuilder = new StringBuilder();
-
-        stringBuilder.append("'");
-        for (String param : params) {
-            stringBuilder.append(param + ", ");
-        }
-        stringBuilder.append('\n');
-        for (GeoPosition geoPosition : geoPositions
-        ) {
-            createGeoPointAsCsvRecordByParam(transformQueryParamToDictionary(params), geoPosition, stringBuilder);
-        }
-
-
-        return geoPositions.isEmpty() || params.isEmpty() ? "Empty string" : stringBuilder.toString();
+        return csvSchemaBuilder.build().withHeader();
     }
 
-    StringBuilder createGeoPointAsCsvRecordByParam(Map<String, String> params, GeoPosition geoPosition, StringBuilder str) {
-        str.append("'");
 
-        if (StringUtils.isNotBlank(params.get("id"))) {
-            if (geoPosition.toString().contains(params.get("id"))) {
-                str.append(geoPosition.getId());
-            }
-        }
-        if (StringUtils.isNotBlank(params.get("latitude"))) {
-            if (geoPosition.toString().contains(params.get("latitude"))) {
-                str.append(',').append(geoPosition.getLatitude());
-            }
-        }
-        if (StringUtils.isNotBlank(params.get("longitude"))) {
-            if (geoPosition.toString().contains(params.get("longitude"))) {
-                str.append(',').append(geoPosition.getLongitude());
-            }
-        }
-        str.append("'").append("\n");
-        return str;
-    }
-
-    private Map<String, String> transformQueryParamToDictionary(List<String> params) {
-        Map<String, String> map = new HashMap<>();
-        for (String param : params) {
-            map.put(param, param);
-
-        }
-        return map;
-
-    }
-
-    private List<GeoPosition> getGeoPositions(String json) throws IOException {
-        return mapper.readValue(json, new TypeReference<List<GeoPosition>>() {
+    private List<GeoInfo> getGeoInfos(String json, ObjectMapper mapper) throws IOException {
+        return mapper.readValue(json, new TypeReference<List<GeoInfo>>() {
         });
     }
 }
