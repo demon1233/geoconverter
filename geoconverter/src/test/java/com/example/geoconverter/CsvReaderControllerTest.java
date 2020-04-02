@@ -21,7 +21,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(GeoLocationController.class)
 public class CsvReaderControllerTest {
 
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -71,18 +70,6 @@ public class CsvReaderControllerTest {
     @Test
     public void ShouldReturnEmptyValueStringForGettingZeroGeoInfosWithParams() throws Exception {
         when(restTemplate.getForEntity("http://localhost:8086/generate/json/" + 0, String.class)).thenReturn(ResponseEntity.of(Optional.empty()));
-        String[] params = {"_id", "latitude", "longitude"};
-        when(geoLocationController.getGeoInfosFilteredCsv(0, params)).thenReturn("Empty Value");
-        mockMvc.perform(get("/geoInfo/geoInfoFilteredCsv/0")
-                .param("params", params)
-                .contentType(MediaType.TEXT_PLAIN))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Empty Value"));
-    }
-
-    @Test
-    public void ShouldReturnEmptyValueStringForGettingNullGeoInfosWithParams() throws Exception {
-        when(restTemplate.getForEntity("http://localhost:8086/generate/json/" + 0, String.class)).thenReturn(null);
         String[] params = {"_id", "latitude", "longitude"};
         when(geoLocationController.getGeoInfosFilteredCsv(0, params)).thenReturn("Empty Value");
         mockMvc.perform(get("/geoInfo/geoInfoFilteredCsv/0")
